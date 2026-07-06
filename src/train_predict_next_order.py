@@ -218,7 +218,7 @@ def main() -> None:
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-        predictions.rename(
+        excel_predictions = predictions.rename(
             columns={
                 "cari_id": "CariId",
                 "cari_kod": "CariKod",
@@ -228,7 +228,11 @@ def main() -> None:
                 "tahmini_siparis_tarihi": "TahminiSiparisTarihi",
                 "tahmini_miktar": "TahminiMiktar",
             }
-        ).to_excel(writer, sheet_name="tahminler", index=False)
+        )
+        excel_predictions["TahminiSiparisTarihi"] = pd.to_datetime(
+            excel_predictions["TahminiSiparisTarihi"]
+        ).dt.strftime("%Y-%m-%d")
+        excel_predictions.to_excel(writer, sheet_name="tahminler", index=False)
         pd.DataFrame([metrics]).to_excel(writer, sheet_name="model_metrics", index=False)
 
     model_path = Path(args.model_output)

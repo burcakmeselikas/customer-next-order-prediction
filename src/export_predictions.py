@@ -40,6 +40,9 @@ def export_predictions_to_excel(predictions: pd.DataFrame, output: str | Path) -
             "tahmini_miktar": "TahminiMiktar",
         }
     )
+    excel_predictions["TahminiSiparisTarihi"] = pd.to_datetime(
+        excel_predictions["TahminiSiparisTarihi"]
+    ).dt.strftime("%Y-%m-%d")
 
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         excel_predictions.to_excel(writer, sheet_name="tahminler", index=False)

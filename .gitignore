@@ -16,4 +16,9 @@ outputs/*
 # Environment files
 .env
 .env.*
+!.env.example
 
+# Local PostgreSQL workspace cluster and logs
+pgdata/
+logs/
+*.log

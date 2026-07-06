@@ -171,9 +171,10 @@ def create_predictions(feature_frame: pd.DataFrame, days_model, quantity_model, 
     predicted_days = np.clip(days_model.predict(latest[FEATURE_COLUMNS]), 1, 365)
     predicted_days = np.maximum(7, np.round(predicted_days / 7) * 7).astype(int)
     predicted_quantity = np.clip(quantity_model.predict(latest[FEATURE_COLUMNS]), 0, None)
+    predicted_quantity = np.maximum(1, np.floor(predicted_quantity + 0.5)).astype("int64")
 
     latest["tahmini_gun"] = predicted_days
-    latest["tahmini_miktar"] = np.round(predicted_quantity, 2)
+    latest["tahmini_miktar"] = predicted_quantity
     latest["tahmini_siparis_tarihi"] = latest["hafta"] + pd.to_timedelta(latest["tahmini_gun"], unit="D")
 
     output_columns = [

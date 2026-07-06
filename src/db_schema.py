@@ -64,7 +64,7 @@ def create_next_order_predictions_table(engine, table: str, schema: str | None =
                     stock_kod TEXT NOT NULL,
                     stock_ad TEXT NOT NULL,
                     tahmini_siparis_tarihi TIMESTAMP NOT NULL,
-                    tahmini_miktar NUMERIC(18, 4) NOT NULL,
+                    tahmini_miktar BIGINT NOT NULL,
                     PRIMARY KEY (cari_id, stock_id)
                 )
                 """

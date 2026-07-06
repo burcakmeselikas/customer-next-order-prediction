@@ -54,7 +54,7 @@ Kolonlar:
 - `StockKod`
 - `StockAd`
 - `TahminiSiparisTarihi`
-- `TahminiMiktar`
+- `TahminiMiktar` tam adettir; ondalikli miktar yazilmaz.
 
 Bu bilgisayarda proje için local PostgreSQL cluster `pgdata/` altında oluşturuldu ve `.env` dosyası `localhost:5433` portunu kullanıyor.
 

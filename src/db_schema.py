@@ -63,8 +63,38 @@ def create_next_order_predictions_table(engine, table: str, schema: str | None =
                     stock_id BIGINT NOT NULL,
                     stock_kod TEXT NOT NULL,
                     stock_ad TEXT NOT NULL,
-                    tahmini_siparis_tarihi TIMESTAMP NOT NULL,
-                    tahmini_miktar BIGINT NOT NULL,
+                    son_siparis_tarihi TIMESTAMP NOT NULL,
+                    son_siparis_miktari NUMERIC(18, 2) NOT NULL,
+                    gecmis_siparis_sayisi BIGINT NOT NULL,
+                    son_siparisten_gecen_gun BIGINT NOT NULL,
+                    tahmini_siparis_tarihi TIMESTAMP,
+                    tahmini_gun BIGINT,
+                    tahmini_miktar NUMERIC(18, 2),
+                    tekrar_alma_olasiligi NUMERIC(18, 4) NOT NULL,
+                    guven_skoru NUMERIC(18, 2) NOT NULL,
+                    guven_seviyesi TEXT NOT NULL,
+                    tahmin_durumu TEXT NOT NULL,
+                    tahmin_aciklamasi TEXT NOT NULL,
+                    ortalama_siparis_araligi_gun NUMERIC(18, 2),
+                    medyan_siparis_araligi_gun NUMERIC(18, 2),
+                    ortalama_miktar NUMERIC(18, 2) NOT NULL,
+                    medyan_miktar NUMERIC(18, 2) NOT NULL,
+                    son3_siparis_ortalamasi NUMERIC(18, 2) NOT NULL,
+                    son6_siparis_ortalamasi NUMERIC(18, 2) NOT NULL,
+                    siparis_araligi_std NUMERIC(18, 2) NOT NULL,
+                    miktar_std NUMERIC(18, 2) NOT NULL,
+                    miktar_p95 NUMERIC(18, 2) NOT NULL,
+                    aktif_aylar TEXT NOT NULL,
+                    siparis_duzenlilik_skoru NUMERIC(18, 3) NOT NULL,
+                    aralik_yorumu TEXT NOT NULL,
+                    siparis_deseni TEXT NOT NULL,
+                    tarih_tahmin_yontemi TEXT NOT NULL,
+                    model_tahmini_siparis_tarihi TIMESTAMP,
+                    baseline_tahmini_siparis_tarihi TIMESTAMP,
+                    tarih_yayma_uygulandi BOOLEAN NOT NULL,
+                    ham_tahmini_siparis_tarihi TIMESTAMP NOT NULL,
+                    ham_tahmin_gecmise_dustu BOOLEAN NOT NULL,
+                    aksiyon_tahmini BOOLEAN NOT NULL,
                     PRIMARY KEY (cari_id, stock_id)
                 )
                 """
@@ -76,6 +106,8 @@ def create_next_order_predictions_table(engine, table: str, schema: str | None =
                 f"ON {table_sql} (tahmini_siparis_tarihi)"
             )
         )
+        connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_{table}_status ON {table_sql} (tahmin_durumu)"))
+        connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_{table}_confidence ON {table_sql} (guven_seviyesi)"))
         connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_{table}_cari_kod ON {table_sql} (cari_kod)"))
         connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_{table}_stock_kod ON {table_sql} (stock_kod)"))
 

@@ -77,6 +77,7 @@ def clean_sales_frame(frame: pd.DataFrame) -> pd.DataFrame:
     df["toplam_miktar"] = df["toplam_miktar"].fillna(0).clip(lower=0)
     df["toplam_tutar"] = df["toplam_tutar"].fillna(0).clip(lower=0)
     df["siparis_satir_sayisi"] = df["siparis_satir_sayisi"].fillna(0).clip(lower=0).astype("int64")
+    df = df[df["toplam_miktar"] > 0].copy()
     return df
 
 

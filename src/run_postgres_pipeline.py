@@ -60,8 +60,11 @@ def main() -> None:
 
     sales_from_db = read_sales_from_postgres(args.sales_table, args.schema)
     feature_frame = add_time_series_features(sales_from_db)
-    days_model, quantity_model, metrics, training = train_models(feature_frame, args.min_training_orders)
-    predictions = create_predictions(feature_frame, days_model, quantity_model, metrics)
+    repeat_model, days_model, quantity_model, metrics, training, analytics = train_models(
+        feature_frame,
+        args.min_training_orders,
+    )
+    predictions = create_predictions(feature_frame, repeat_model, days_model, quantity_model, metrics)
 
     prepare_table(engine, args.predictions_table, args.schema, "predictions", "replace")
     write_frame_to_table(predictions, engine, args.predictions_table, args.schema, args.chunksize)
@@ -71,10 +74,12 @@ def main() -> None:
     model_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(
         {
+            "repeat_model": repeat_model,
             "days_model": days_model,
             "quantity_model": quantity_model,
             "feature_columns": FEATURE_COLUMNS,
             "metrics": metrics,
+            "analytics": analytics,
             "trained_rows": len(training),
             "source_table": table_reference(args.sales_table, args.schema),
             "predictions_table": table_reference(args.predictions_table, args.schema),
@@ -84,12 +89,14 @@ def main() -> None:
     )
 
     predictions_from_db = read_predictions(args.predictions_table, args.schema)
-    output_path = export_predictions_to_excel(predictions_from_db, args.output)
+    output_path = export_predictions_to_excel(predictions_from_db, args.output, metrics=metrics, analytics=analytics)
 
     print(f"Training rows: {metrics['training_rows']:,}")
     print(f"Validation rows: {metrics['validation_rows']:,}")
-    print(f"Validation next-order date MAE: {metrics['validation_days_mae']:.2f} days")
-    print(f"Validation quantity MAE: {metrics['validation_quantity_mae']:.2f}")
+    print(f"Validation next-order date MAE: {metrics['tarih_mae']:.2f} days")
+    print(f"Validation quantity MAE: {metrics['miktar_mae']:.2f}")
+    print(f"Actionable prediction rows: {metrics['actionable_prediction_rows']:,}")
+    print(f"Overdue rows: {metrics['overdue_rows']:,}")
     print(f"Excel exported from PostgreSQL: {output_path}")
     print(f"Model written: {model_path}")
 
